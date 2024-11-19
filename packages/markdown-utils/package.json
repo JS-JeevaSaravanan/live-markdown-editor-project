@@ -1,0 +1,9 @@
+{
+  "name": "markdown-utils",
+  "version": "1.0.0",
+  "main": "utils.js",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
