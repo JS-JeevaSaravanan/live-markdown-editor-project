@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDebounce } from "./customHooks"; // Custom hook for debouncing input
-import { processMdToHTML } from "./utils"; // Utility function to process markdown to HTML
 
 const MainSection = ({ isSidePanelOpen }) => {
   const [markdown, setMarkdown] = useState(""); // State for markdown input
@@ -8,7 +7,7 @@ const MainSection = ({ isSidePanelOpen }) => {
   const [loading, setLoading] = useState(false); // State to show loading indicator
   const [socketStatus, setSocketStatus] = useState("disconnected"); // WebSocket status
 
-  const debouncedValue = useDebounce(markdown, 200); // Debounced markdown value
+  const debouncedValue = useDebounce(markdown, 100); // Debounced markdown value
   const socketRef = useRef(null); // Ref to hold WebSocket instance
 
   // WebSocket connection logic
@@ -22,7 +21,7 @@ const MainSection = ({ isSidePanelOpen }) => {
     };
 
     socket.onmessage = (event) => {
-      console.log("Received from WebSocket:", event.data);
+      // console.log("Received from WebSocket:", event.data);
       setHtmlOutput(event.data); // Set the HTML output
       setLoading(false); // Hide loading indicator
     };
@@ -49,16 +48,13 @@ const MainSection = ({ isSidePanelOpen }) => {
       setLoading(true); // Show loading indicator while waiting for response
     } else {
       console.error("WebSocket is not connected");
-      setHtmlOutput(processMdToHTML(markdownText)); // Fallback to local processing if WebSocket is down
       setLoading(false);
     }
   };
 
   // Effect to send debounced markdown to WebSocket server
   useEffect(() => {
-    if (debouncedValue.trim()) {
-      sendMarkdownToServer(debouncedValue); // Send the debounced value
-    }
+    sendMarkdownToServer(debouncedValue); // Send the debounced value
   }, [debouncedValue]);
 
   const handleInputChange = (e) => {

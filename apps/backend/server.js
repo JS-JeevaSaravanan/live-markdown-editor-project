@@ -21,7 +21,7 @@ wss.on("connection", (ws) => {
 
   // Handle incoming messages (markdown chunks)
   ws.on("message", async (markdownChunk) => {
-    console.log("Received markdown chunk:", markdownChunk);
+    // console.log("Received markdown chunk:", markdownChunk);
 
     try {
       // If the message is a Buffer, convert it into a string (text)
