@@ -1,38 +1,69 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { processMdToHTML } from "./utils"; // Utility function to convert markdown to HTML
-import { useDebounce } from "./customHooks"; 
+import { useDebounce } from "./customHooks"; // Custom hook for debouncing input
+import { processMdToHTML } from "./utils"; // Utility function to process markdown to HTML
 
-const MainSection = ({
-  isSidePanelOpen,
-}) => {
+const MainSection = ({ isSidePanelOpen }) => {
+  const [markdown, setMarkdown] = useState(""); // State for markdown input
+  const [htmlOutput, setHtmlOutput] = useState(""); // State for the HTML output
+  const [loading, setLoading] = useState(false); // State to show loading indicator
+  const [socketStatus, setSocketStatus] = useState("disconnected"); // WebSocket status
 
+  const debouncedValue = useDebounce(markdown, 200); // Debounced markdown value
+  const socketRef = useRef(null); // Ref to hold WebSocket instance
 
-
-  const [markdown, setMarkdown] = useState(""); // Markdown text state
-  const [htmlOutput, setHtmlOutput] = useState(""); // HTML output state
-  const [loading, setLoading] = useState(false); // Loading state
-  
-  const debouncedValue = useDebounce(markdown, 200); // Debounced markdown input value
-
-  // Cache for storing converted Markdown chunks
-  const cache = useRef(new Map());
-
+  // WebSocket connection logic
   useEffect(() => {
-    processMarkdown(debouncedValue);
-  }, [debouncedValue]);
+    const socket = new WebSocket("ws://localhost:5002"); // Connect to WebSocket server
+    socketRef.current = socket;
 
-  const processMarkdown = useCallback(async (newMdText) => {
-    setLoading(true);
-    const newHtmlOutput = await processMdToHTML(newMdText, cache);
-    setHtmlOutput(newHtmlOutput); // Update HTML output
-    setLoading(false); // Set loading to false
+    socket.onopen = () => {
+      setSocketStatus("connected");
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Received from WebSocket:", event.data);
+      setHtmlOutput(event.data); // Set the HTML output
+      setLoading(false); // Hide loading indicator
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setSocketStatus("error");
+    };
+
+    socket.onclose = () => {
+      setSocketStatus("disconnected");
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      socket.close(); // Cleanup WebSocket on unmount
+    };
   }, []);
 
-  const handleInputChange = (e) => {
-    setMarkdown(e.target.value); // Update markdown text state
+  // Send markdown to WebSocket server
+  const sendMarkdownToServer = (markdownText) => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(markdownText); // Send to WebSocket server
+      setLoading(true); // Show loading indicator while waiting for response
+    } else {
+      console.error("WebSocket is not connected");
+      setHtmlOutput(processMdToHTML(markdownText)); // Fallback to local processing if WebSocket is down
+      setLoading(false);
+    }
   };
 
+  // Effect to send debounced markdown to WebSocket server
+  useEffect(() => {
+    if (debouncedValue.trim()) {
+      sendMarkdownToServer(debouncedValue); // Send the debounced value
+    }
+  }, [debouncedValue]);
 
+  const handleInputChange = (e) => {
+    setMarkdown(e.target.value); // Update markdown text state on input change
+  };
 
   const styles = {
     textarea: {

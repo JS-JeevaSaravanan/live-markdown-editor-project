@@ -2,36 +2,72 @@ const express = require("express");
 const cors = require("cors");
 const { marked } = require("marked");
 const crypto = require("crypto");
+const WebSocket = require("ws"); // WebSocket library
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const cache = new Map(); // In-memory cache (consider Redis for production).
+const cache = new Map(); // In-memory cache (consider Redis for production)
 
-// Generate a hash of the input Markdown for efficient caching.
-const generateHash = (input) => crypto.createHash("md5").update(input).digest("hex");
+const generateHash = (input) =>
+  crypto.createHash("md5").update(input).digest("hex");
 
-app.post("/convert", (req, res) => {
-  const { markdown } = req.body;
-  if (!markdown) return res.status(400).json({ error: "No Markdown provided" });
+// WebSocket server setup
+const wss = new WebSocket.Server({ noServer: true });
 
-  const hash = generateHash(markdown);
-  if (cache.has(hash)) {
-    return res.json({ html: cache.get(hash) }); // Serve from cache.
-  }
+wss.on("connection", (ws) => {
+  console.log("Client connected via WebSocket");
 
-  try {
-    const html = marked(markdown);
-    cache.set(hash, html); // Cache the result.
-    res.json({ html });
-  } catch (error) {
-    console.error("Markdown conversion error:", error);
-    res.status(500).json({ error: "Conversion failed" });
-  }
+  // Handle incoming messages (markdown chunks)
+  ws.on("message", async (markdownChunk) => {
+    console.log("Received markdown chunk:", markdownChunk);
+
+    try {
+      // If the message is a Buffer, convert it into a string (text)
+      if (Buffer.isBuffer(markdownChunk)) {
+        markdownChunk = markdownChunk.toString("utf-8"); // Convert Buffer to a string
+      }
+
+      // Convert markdown chunk to HTML
+      const hash = generateHash(markdownChunk);
+      let html = "";
+
+      if (cache.has(hash)) {
+        // If chunk was previously converted and cached
+        html = cache.get(hash);
+      } else {
+        html = marked(markdownChunk); // Convert markdown to HTML
+        cache.set(hash, html); // Cache the result
+      }
+
+      // Send back the HTML chunk
+      ws.send(html);
+    } catch (error) {
+      console.error("Error processing markdown:", error);
+      ws.send("Error converting markdown.");
+    }
+  });
+
+  // Handle WebSocket errors
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
+
+  // Handle WebSocket closure
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
 });
 
-const PORT = 5002;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Upgrade HTTP server to handle WebSocket connections
+app.server = app.listen(5002, () => {
+  console.log("Express server running on http://localhost:5002");
+});
+
+// Handle WebSocket upgrade requests from HTTP
+app.server.on("upgrade", (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit("connection", ws, request);
+  });
 });
