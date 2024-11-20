@@ -1,5 +1,3 @@
-import React from "react";
-
 const Header = ({ toggleSidePanel, isSidePanelOpen }) => {
   const styles = {
     header: {
