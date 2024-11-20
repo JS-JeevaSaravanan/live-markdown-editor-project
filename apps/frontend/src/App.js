@@ -1,42 +1,39 @@
-import { useState, useCallback } from "react";
-import axios from "axios";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { processMdToHTML } from "./utils";
 
 const App = () => {
   const [markdown, setMarkdown] = useState("");
   const [htmlOutput, setHtmlOutput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const axiosInstance = axios.create({
-    baseURL: "http://localhost:5002", // Backend URL
-    withCredentials: false,
-  });
+  // Cache for storing converted Markdown chunks
+  const cache = useRef(new Map());
 
-  // Debounced function to reduce API calls
-  const convertToHtml = useCallback(
-    debounce(async (md) => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.post("/convert", { markdown: md });
-        setHtmlOutput(response.data.html);
-      } catch (error) {
-        console.error("Error converting Markdown:", error);
-        setHtmlOutput("<p style='color: red;'>Conversion failed</p>");
-      } finally {
-        setLoading(false);
-      }
-    }, 300), // 300ms debounce
-    []
+  // Function to process the entire Markdown input
+  const processMarkdown = useCallback(async () => {
+    setLoading(true);
+
+    const newHtmlOutput = await processMdToHTML(markdown, cache);
+
+    // Combine processed chunks into final HTML output
+    setHtmlOutput(newHtmlOutput); // Add spacing between chunks
+    setLoading(false);
+  }, [markdown]);
+
+  // Debounced Markdown processing
+  const debouncedProcessMarkdown = useCallback(
+    debounce(processMarkdown, 3000),
+    [processMarkdown]
   );
+
+  // Effect to trigger processing when Markdown changes
+  useEffect(() => {
+    debouncedProcessMarkdown();
+  }, [markdown, debouncedProcessMarkdown]);
 
   // Handle Markdown input change
   const handleInputChange = (e) => {
-    const md = e.target.value;
-    setMarkdown(md);
-    if (md.trim()) {
-      convertToHtml(md);
-    } else {
-      setHtmlOutput("");
-    }
+    setMarkdown(e.target.value);
   };
 
   return (
