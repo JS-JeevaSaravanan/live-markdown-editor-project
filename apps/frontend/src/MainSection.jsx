@@ -7,13 +7,13 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
   const [loading, setLoading] = useState(false); // State to show loading indicator
   const [socketStatus, setSocketStatus] = useState("disconnected"); // WebSocket status
 
-  const debouncedValue = useDebounce(markdown, 300); // Debounced markdown value
+  const debouncedValue = useDebounce(markdown, 50); // Debounced markdown value
   const socketRef = useRef(null); // Ref to hold WebSocket instance
 
   // Update markdown state when content changes
   useEffect(() => {
     setMarkdown(content || ""); // Sync markdown state with the content prop
-  }, [content]);
+  }, [content, activeFile]);
 
   // Effect for WebSocket connection
   useEffect(() => {

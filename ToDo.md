@@ -20,6 +20,13 @@ Features:
 - document file name and edit
 - delete and create file
 - keyboard shortcut
+- theme change
+- font size change
+- font family change
+- line number
+- word wrap
+- search and replace
+- full screen zen mode
 
 Bugs:
 
