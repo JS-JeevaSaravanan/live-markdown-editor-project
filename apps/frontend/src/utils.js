@@ -37,4 +37,14 @@ const processMdToHTML = async (markdown, cache) => {
   return htmlChunks.join("<br><br>");
 };
 
-export { processMdToHTML };
+// Debounce utility function
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
+export { processMdToHTML, debounce };
