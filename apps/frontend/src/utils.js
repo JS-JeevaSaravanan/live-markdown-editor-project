@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
 
 const convertChunk = async (chunk, cache) => {
   try {
-    console.log("### request chunk:", chunk);
+    // console.log("### request chunk:", chunk);
     const response = await axiosInstance.post("/convert", { markdown: chunk });
     const chunkHtml = response.data.html;
     cache.current.set(chunk, chunkHtml);
@@ -18,9 +18,54 @@ const convertChunk = async (chunk, cache) => {
   }
 };
 
+function splitMarkdowns(markdownText) {
+  // split markdown into chunks 
+  // return markdownText.split(/\n\s*\n/);
+
+  return (markdownText.split(/\n\n+/))
+}
+
+function splitMarkdownToChunks(markdownText, chunkSize = 1000) {
+  // split markdown into chunks 
+
+  const chunks = [];
+  let currentChunk = "";
+  
+  // Split the markdown into blocks based on double newlines (paragraphs)
+  const blocks = markdownText.split(/\n{2,}/);  // Split at double newlines (paragraphs, list items, etc.)
+  
+  blocks.forEach(block => {
+      // If adding this block exceeds the chunk size, start a new chunk
+      if ((currentChunk + block).length + 1 > chunkSize) {
+          chunks.push(currentChunk);
+          currentChunk = block;  // Start a new chunk
+      } else {
+          // Append this block to the current chunk
+          if (currentChunk.length > 0) {
+              currentChunk += "\n\n" + block;
+          } else {
+              currentChunk = block;
+          }
+      }
+  });
+
+  // Add the last chunk if there's any leftover content
+  if (currentChunk) {
+      chunks.push(currentChunk);
+  }
+
+  return chunks;
+}
+
 const processMdToHTML = async (markdown, cache) => {
   // Split Markdown into chunks by double newlines (paragraphs)
-  const chunks = markdown.split(/\n/);
+  // const chunks = markdown.split(/\n/);
+  const chunks = [markdown];
+  // const chunks = markdown.split(/\n\s*\n/);
+
+  // const chunks = splitMarkdowns(markdown);
+  console.log('## chunks: ', chunks);
+
   const htmlChunks = await Promise.all(
     chunks.map(async (chunk) => {
       if (chunk.trim()) {
@@ -34,7 +79,7 @@ const processMdToHTML = async (markdown, cache) => {
   );
 
   // Combine processed chunks into final HTML output
-  return htmlChunks.join("<br><br>");
+  return htmlChunks.join("");
 };
 
 // Debounce utility function

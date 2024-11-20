@@ -7,30 +7,9 @@ import MainSection from "./MainSection";
 import Footer from "./Footer";
 
 const App = () => {
-  const [markdown, setMarkdown] = useState(""); // Markdown text state
-  const [htmlOutput, setHtmlOutput] = useState(""); // HTML output state
-  const [loading, setLoading] = useState(false); // Loading state
+
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(true); // State for side panel visibility
 
-  const debouncedValue = useDebounce(markdown, 200); // Debounced markdown input value
-
-  // Cache for storing converted Markdown chunks
-  const cache = useRef(new Map());
-
-  useEffect(() => {
-    processMarkdown(debouncedValue);
-  }, [debouncedValue]);
-
-  const processMarkdown = useCallback(async (newMdText) => {
-    setLoading(true);
-    const newHtmlOutput = await processMdToHTML(newMdText, cache);
-    setHtmlOutput(newHtmlOutput); // Update HTML output
-    setLoading(false); // Set loading to false
-  }, []);
-
-  const handleInputChange = (e) => {
-    setMarkdown(e.target.value); // Update markdown text state
-  };
 
   const toggleSidePanel = () => {
     setIsSidePanelOpen((prev) => !prev);
@@ -51,10 +30,6 @@ const App = () => {
 
         {/* Main Section: Editor and Output */}
         <MainSection
-          markdown={markdown}
-          htmlOutput={htmlOutput}
-          loading={loading}
-          handleInputChange={handleInputChange}
           isSidePanelOpen={isSidePanelOpen}
         />
       </div>
