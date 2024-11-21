@@ -8,7 +8,9 @@ export const loadFilesFromStorage = () => {
 
 // Utility function to save files to localStorage
 export const saveFilesToStorage = (files) => {
+  console.log('saveFilesToStorage: ', files);
   localStorage.setItem("markdownFiles", JSON.stringify(files));
+  return loadFilesFromStorage();
 };
 
 // Utility function to create a unique file name
@@ -46,8 +48,8 @@ export const handleFileImport = (file, files, createFile, saveFile) => {
     let baseFileName = file.name.replace(/\.[^/.]+$/, ""); // Strip file extension
 
     const uniqueFileName = generateUniqueFileName(baseFileName, files); // Ensure unique file name
-    createFile(uniqueFileName); // Create the file
-    saveFile(uniqueFileName, content); // Save the file content
+    createFile(uniqueFileName, content); // Create the file
+    // saveFile(uniqueFileName, content); // Save the file content
   };
 
   reader.onerror = () => {

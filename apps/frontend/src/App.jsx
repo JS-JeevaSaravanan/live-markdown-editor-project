@@ -9,58 +9,49 @@ import {
   handleFileImport,
   handleFileExport,
   previewExport,
-  generateUniqueFileName,
-} from "./utils"; // Import the utilities
+} from "./utils";
 
 const App = () => {
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // Default: sidebar is closed
   const [activeFile, setActiveFile] = useState(null);
   const [files, setFiles] = useState(() => loadFilesFromStorage()); // Use utility to load files from localStorage
 
-  // Set the first file as active on mount or create a new one
+  const createFile = (fileName = "File 1", content = "") => {
+    if (!fileName || files[fileName]) {
+      alert("File name must be unique and not empty.");
+      return;
+    }
+    const updatedFiles = { ...files, [fileName]: content };
+    setFiles(saveFilesToStorage(updatedFiles));
+    setActiveFile(fileName);
+  };
+
   useEffect(() => {
     if (Object.keys(files).length === 0) {
-      // No files, create the first one
-      const newFileName = "File 1";
-      const updatedFiles = { [newFileName]: "" };
-      setFiles(updatedFiles);
-      saveFilesToStorage(updatedFiles);
-      setActiveFile(newFileName); // Set newly created file as active
+      createFile();
     } else {
-      // If files exist, set the first one as active
       const firstFile = Object.keys(files)[0];
       setActiveFile(firstFile);
     }
-  }, [files]);
+  }, []);
 
   const toggleSidePanel = () => {
     setIsSidePanelOpen((prev) => !prev);
   };
 
   const saveFile = useCallback((fileName, content) => {
+    console.log('saveFile: ', fileName, content);
     setFiles((prevFiles) => {
       const updatedFiles = { ...prevFiles, [fileName]: content };
-      saveFilesToStorage(updatedFiles); // Save files to localStorage
-      return updatedFiles;
+      return saveFilesToStorage(updatedFiles); // Save files to localStorage
     });
   }, []);
 
   const deleteFile = (fileName) => {
     const { [fileName]: _, ...rest } = files;
-    setFiles(rest);
-    saveFilesToStorage(rest); // Save updated files to localStorage
-    if (activeFile === fileName) setActiveFile(null);
-  };
-
-  const createFile = (fileName) => {
-    if (!fileName || files[fileName]) {
-      alert("File name must be unique and not empty.");
-      return;
-    }
-    const updatedFiles = { ...files, [fileName]: "" };
-    setFiles(updatedFiles);
-    saveFilesToStorage(updatedFiles);
-    setActiveFile(fileName);
+    setFiles(saveFilesToStorage(rest)); // Save updated files to localStorage
+    if (activeFile === fileName)
+      setActiveFile(files[Object.keys(rest)[0]] ? Object.keys(rest)[0] : null);
   };
 
   const renameFile = (oldName, newName) => {
@@ -70,8 +61,7 @@ const App = () => {
     }
     const { [oldName]: content, ...rest } = files;
     const updatedFiles = { ...rest, [newName]: content };
-    setFiles(updatedFiles);
-    saveFilesToStorage(updatedFiles);
+    setFiles(saveFilesToStorage(updatedFiles));
     if (activeFile === oldName) setActiveFile(newName);
   };
 

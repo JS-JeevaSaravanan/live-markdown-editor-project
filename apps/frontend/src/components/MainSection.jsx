@@ -12,6 +12,7 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
   const socketRef = useRef(null); // Ref to hold WebSocket instance
 
   useEffect(() => {
+    console.log("MainSection rendered", activeFile, content);
     setMarkdown(content || ""); // Sync markdown state with the content prop
   }, [content, activeFile]);
 

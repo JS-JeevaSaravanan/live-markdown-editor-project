@@ -25,7 +25,7 @@ const SidePanel = ({
       top: 0,
       left: 0,
       bottom: 0,
-      transition: "transform 0.3s ease-in-out",
+      transition: "transform 0.2.5s ease-in-out",
       transform: isOpen ? "translateX(0)" : "translateX(-100%)",
       fontFamily: "Consolas, 'Courier New', monospace",
       overflowY: "auto",
@@ -154,12 +154,16 @@ const SidePanel = ({
     if (newFileName.trim()) {
       createFile(newFileName.trim());
       setNewFileName("");
-      setActiveFile(newFileName.trim()); // Set newly created file as active
+      // setActiveFile(newFileName.trim()); // Set newly created file as active
     }
   };
 
   const handleRenameFile = () => {
-    if (renamingFile && newFileNameForRename.trim() && !isFileNameTaken(newFileNameForRename)) {
+    if (
+      renamingFile &&
+      newFileNameForRename.trim() &&
+      !isFileNameTaken(newFileNameForRename)
+    ) {
       renameFile(renamingFile, newFileNameForRename.trim());
       setRenamingFile(null);
       setNewFileNameForRename("");
@@ -226,7 +230,7 @@ const SidePanel = ({
                   </button>
                 )}
                 {/* Disable delete button for the last item */}
-                {!isDeleteDisabled && fileName !== activeFile && (
+                {!isDeleteDisabled && (
                   <button
                     style={{
                       ...styles.iconButton,
