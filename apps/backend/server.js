@@ -1,37 +1,44 @@
 const express = require("express");
 const cors = require("cors");
 const { marked } = require("marked");
-const crypto = require("crypto");
+const WebSocket = require("ws");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const cache = new Map(); // In-memory cache (consider Redis for production).
+const wss = new WebSocket.Server({ noServer: true });
 
-// Generate a hash of the input Markdown for efficient caching.
-const generateHash = (input) => crypto.createHash("md5").update(input).digest("hex");
+wss.on("connection", (ws) => {
+  ws.on("message", async (markdownChunk) => {
+    try {
+      if (Buffer.isBuffer(markdownChunk)) {
+        markdownChunk = markdownChunk.toString("utf-8");
+      }
 
-app.post("/convert", (req, res) => {
-  const { markdown } = req.body;
-  if (!markdown) return res.status(400).json({ error: "No Markdown provided" });
+      const html = marked(markdownChunk);
+      ws.send(html);
+    } catch (error) {
+      console.error("Error processing markdown:", error);
+      ws.send("Error converting markdown.");
+    }
+  });
 
-  const hash = generateHash(markdown);
-  if (cache.has(hash)) {
-    return res.json({ html: cache.get(hash) }); // Serve from cache.
-  }
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
 
-  try {
-    const html = marked(markdown);
-    cache.set(hash, html); // Cache the result.
-    res.json({ html });
-  } catch (error) {
-    console.error("Markdown conversion error:", error);
-    res.status(500).json({ error: "Conversion failed" });
-  }
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
 });
 
-const PORT = 5002;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.server = app.listen(5002, () => {
+  console.log("Express server running on http://localhost:5002");
+});
+
+app.server.on("upgrade", (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit("connection", ws, request);
+  });
 });
