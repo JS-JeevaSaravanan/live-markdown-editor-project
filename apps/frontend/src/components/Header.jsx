@@ -19,6 +19,22 @@ const Header = ({
       justifyContent: "space-between",
       fontFamily: "Consolas, 'Courier New', monospace",
       borderBottom: "1px solid #333",
+      position: "relative", // for the dropdown menu
+    },
+    headerTitle: {
+      fontSize: "20px",
+      margin: 0,
+      fontWeight: "bold",
+      flex: 1, // Makes the title take up available space on the left
+    },
+    controls: {
+      display: "flex",
+      gap: "15px",
+      alignItems: "center",
+      justifyContent: "flex-end", // Aligns the buttons to the right
+    },
+    fileInput: {
+      display: "none",
     },
     toggleButton: {
       backgroundColor: "#007acc",
@@ -34,19 +50,7 @@ const Header = ({
     toggleButtonHover: {
       backgroundColor: "#005f99",
     },
-    headerTitle: {
-      fontSize: "20px",
-      margin: 0,
-      fontWeight: "bold",
-    },
-    controls: {
-      display: "flex",
-      gap: "10px",
-    },
-    fileInput: {
-      display: "none",
-    },
-    exportMenu: {
+    dropdownMenu: {
       position: "absolute",
       top: "50px",
       right: "20px",
@@ -56,8 +60,10 @@ const Header = ({
       borderRadius: "4px",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
       zIndex: 1000,
+      width: "150px",
+      display: isExportMenuOpen ? "block" : "none",
     },
-    exportMenuItem: {
+    dropdownItem: {
       padding: "10px 15px",
       cursor: "pointer",
       fontFamily: "Consolas, 'Courier New', monospace",
@@ -65,8 +71,16 @@ const Header = ({
       borderBottom: "1px solid #333",
       transition: "background-color 0.2s ease",
     },
-    exportMenuItemHover: {
+    dropdownItemHover: {
       backgroundColor: "#333",
+    },
+    hamburgerButton: {
+      fontSize: "20px",
+      backgroundColor: "transparent",
+      color: "#fff",
+      border: "none",
+      cursor: "pointer",
+      padding: "0",
     },
   };
 
@@ -80,24 +94,24 @@ const Header = ({
 
   const handleExport = (format) => {
     exportFile(format); // Trigger the export action
-    setIsExportMenuOpen(false);
+    setIsExportMenuOpen(false); // Close the export menu after selection
   };
 
   return (
     <header style={styles.header}>
-      <div style={styles.controls}>
-        <button
-          onClick={toggleSidePanel}
-          style={styles.toggleButton}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
-        >
-          {isSidePanelOpen ? "Close Sidebar" : "Open Sidebar"}
+      <div style={{ display: "flex", alignItems: "center" }}>
+        {/* Hamburger Menu Button */}
+        <button style={styles.hamburgerButton} onClick={toggleSidePanel}>
+          ☰
         </button>
+        {/* Markdown Editor Title */}
+        <h1 style={styles.headerTitle}> Markdown Editor 📄</h1>
+      </div>
 
+      <div style={styles.controls}>
         {/* Import Button */}
         <label htmlFor="file-input" style={styles.toggleButton}>
-          Import File
+          Import
           <input
             id="file-input"
             type="file"
@@ -110,28 +124,26 @@ const Header = ({
           />
         </label>
 
-        {/* Export Button */}
+        {/* Export Dropdown Button */}
         <button
           style={styles.toggleButton}
           onClick={() => setIsExportMenuOpen((prev) => !prev)}
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
         >
           Export
         </button>
-      </div>
 
-      <h1 style={styles.headerTitle}>📄 Markdown Editor</h1>
-
-      {/* Export Menu */}
-      {isExportMenuOpen && (
-        <div style={styles.exportMenu}>
+        {/* Export Menu (Dropdown) */}
+        <div style={styles.dropdownMenu}>
           {["Markdown", "HTML", "Styled HTML", "PDF"].map((format) => (
             <div
               key={format}
-              style={styles.exportMenuItem}
+              style={styles.dropdownItem}
               onClick={() => handleExport(format.toLowerCase())}
               onMouseOver={(e) =>
                 (e.target.style.backgroundColor =
-                  styles.exportMenuItemHover.backgroundColor)
+                  styles.dropdownItemHover.backgroundColor)
               }
               onMouseOut={(e) =>
                 (e.target.style.backgroundColor = "transparent")
@@ -156,7 +168,7 @@ const Header = ({
             </div>
           ))}
         </div>
-      )}
+      </div>
     </header>
   );
 };

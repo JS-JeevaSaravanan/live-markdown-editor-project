@@ -8,9 +8,10 @@ const SidePanel = ({
   createFile,
   deleteFile,
   renameFile,
+  toggleSidePanel, // Added this prop for the toggle function
 }) => {
   const [newFileName, setNewFileName] = useState("");
-  const [renamingFile, setRenamingFile] = useState(null); // File being renamed
+  const [renamingFile, setRenamingFile] = useState(null);
   const [newFileNameForRename, setNewFileNameForRename] = useState("");
 
   const styles = {
@@ -81,6 +82,26 @@ const SidePanel = ({
       fontSize: "16px",
       marginLeft: "10px",
     },
+    closeButton: {
+      position: "absolute",
+      top: "20px",
+      right: "20px",
+      background: "transparent",
+      border: "none",
+      color: "#fff",
+      fontSize: "20px",
+      cursor: "pointer",
+    },
+    hamburgerButton: {
+      fontSize: "30px",
+      color: "#fff",
+      background: "transparent",
+      border: "none",
+      cursor: "pointer",
+      position: "absolute",
+      top: "20px",
+      left: "20px",
+    },
   };
 
   const handleCreateFile = () => {
@@ -99,73 +120,81 @@ const SidePanel = ({
   };
 
   return (
-    <div style={styles.sidePanel}>
-      <h3 style={{ borderBottom: "1px solid #333", paddingBottom: "10px" }}>
-        📂 Markdown Files
-      </h3>
-      <div>
-        {Object.keys(files).length === 0 ? (
-          <p>No files available.</p>
-        ) : (
-          Object.keys(files).map((fileName) => (
-            <div
-              key={fileName}
-              style={{
-                ...styles.fileItem,
-                ...(fileName === activeFile ? styles.activeFile : {}),
-              }}
-              onClick={() => setActiveFile(fileName)}
-            >
-              {renamingFile === fileName ? (
-                <input
-                  type="text"
-                  value={newFileNameForRename}
-                  onChange={(e) => setNewFileNameForRename(e.target.value)}
-                  onBlur={handleRenameFile}
-                  autoFocus
-                  style={styles.input}
-                />
-              ) : (
-                <span style={{ flexGrow: 1 }}>{fileName}</span>
-              )}
-              <button
-                style={styles.iconButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setRenamingFile(fileName);
-                  setNewFileNameForRename(fileName);
-                }}
-                title="Rename File"
-              >
-                ✏️
-              </button>
-              <button
-                style={{ ...styles.iconButton, color: "#e81123" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteFile(fileName);
-                }}
-                title="Delete File"
-              >
-                ❌
-              </button>
-            </div>
-          ))
-        )}
-      </div>
-      <div style={styles.controls}>
-        <input
-          type="text"
-          placeholder="New File Name"
-          value={newFileName}
-          onChange={(e) => setNewFileName(e.target.value)}
-          style={styles.input}
-        />
-        <button style={styles.button} onClick={handleCreateFile}>
-          Create New File
+    <>
+      {/* Sidebar content */}
+      <div style={styles.sidePanel}>
+        {/* Close button inside the sidebar */}
+        <button style={styles.closeButton} onClick={toggleSidePanel}>
+          ×
         </button>
+
+        <h3 style={{ borderBottom: "1px solid #333", paddingBottom: "10px" }}>
+          📂 Markdown Files
+        </h3>
+        <div>
+          {Object.keys(files).length === 0 ? (
+            <p>No files available.</p>
+          ) : (
+            Object.keys(files).map((fileName) => (
+              <div
+                key={fileName}
+                style={{
+                  ...styles.fileItem,
+                  ...(fileName === activeFile ? styles.activeFile : {}),
+                }}
+                onClick={() => setActiveFile(fileName)}
+              >
+                {renamingFile === fileName ? (
+                  <input
+                    type="text"
+                    value={newFileNameForRename}
+                    onChange={(e) => setNewFileNameForRename(e.target.value)}
+                    onBlur={handleRenameFile}
+                    autoFocus
+                    style={styles.input}
+                  />
+                ) : (
+                  <span style={{ flexGrow: 1 }}>{fileName}</span>
+                )}
+                <button
+                  style={styles.iconButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRenamingFile(fileName);
+                    setNewFileNameForRename(fileName);
+                  }}
+                  title="Rename File"
+                >
+                  ✏️
+                </button>
+                <button
+                  style={{ ...styles.iconButton, color: "#e81123" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteFile(fileName);
+                  }}
+                  title="Delete File"
+                >
+                  ❌
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+        <div style={styles.controls}>
+          <input
+            type="text"
+            placeholder="New File Name"
+            value={newFileName}
+            onChange={(e) => setNewFileName(e.target.value)}
+            style={styles.input}
+          />
+          <button style={styles.button} onClick={handleCreateFile}>
+            Create New File
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

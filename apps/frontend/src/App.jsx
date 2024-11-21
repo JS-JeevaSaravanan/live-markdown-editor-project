@@ -3,15 +3,19 @@ import Header from "./components/Header";
 import SidePanel from "./components/SidePanel";
 import MainSection from "./components/MainSection";
 import Footer from "./components/Footer";
-import { jsPDF } from "jspdf";
+import {
+  loadFilesFromStorage,
+  saveFilesToStorage,
+  handleFileImport,
+  handleFileExport,
+  previewExport,
+  generateUniqueFileName,
+} from "./utils"; // Import the utilities
 
 const App = () => {
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // Default: sidebar is closed
   const [activeFile, setActiveFile] = useState(null);
-  const [files, setFiles] = useState(() => {
-    const storedFiles = localStorage.getItem("markdownFiles");
-    return storedFiles ? JSON.parse(storedFiles) : {};
-  });
+  const [files, setFiles] = useState(() => loadFilesFromStorage()); // Use utility to load files from localStorage
 
   const toggleSidePanel = () => {
     setIsSidePanelOpen((prev) => !prev);
@@ -20,7 +24,7 @@ const App = () => {
   const saveFile = useCallback((fileName, content) => {
     setFiles((prevFiles) => {
       const updatedFiles = { ...prevFiles, [fileName]: content };
-      localStorage.setItem("markdownFiles", JSON.stringify(updatedFiles));
+      saveFilesToStorage(updatedFiles); // Save files to localStorage
       return updatedFiles;
     });
   }, []);
@@ -28,7 +32,7 @@ const App = () => {
   const deleteFile = (fileName) => {
     const { [fileName]: _, ...rest } = files;
     setFiles(rest);
-    localStorage.setItem("markdownFiles", JSON.stringify(rest));
+    saveFilesToStorage(rest); // Save updated files to localStorage
     if (activeFile === fileName) setActiveFile(null);
   };
 
@@ -39,7 +43,7 @@ const App = () => {
     }
     const updatedFiles = { ...files, [fileName]: "" };
     setFiles(updatedFiles);
-    localStorage.setItem("markdownFiles", JSON.stringify(updatedFiles));
+    saveFilesToStorage(updatedFiles);
     setActiveFile(fileName);
   };
 
@@ -51,169 +55,23 @@ const App = () => {
     const { [oldName]: content, ...rest } = files;
     const updatedFiles = { ...rest, [newName]: content };
     setFiles(updatedFiles);
-    localStorage.setItem("markdownFiles", JSON.stringify(updatedFiles));
+    saveFilesToStorage(updatedFiles);
     if (activeFile === oldName) setActiveFile(newName);
   };
 
-  // Handle file import
+  // Handle file import using utility
   const importFileContent = (file) => {
-    if (!file) {
-      alert("No file selected.");
-      return;
-    }
-
-    const allowedExtensions = [".md", ".html"];
-    const fileExtension = file.name
-      .slice(file.name.lastIndexOf("."))
-      .toLowerCase();
-
-    if (!allowedExtensions.includes(fileExtension)) {
-      alert(
-        "Unsupported file type. Please select a Markdown (.md) or HTML (.html) file."
-      );
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target.result;
-      let baseFileName = file.name.replace(/\.[^/.]+$/, ""); // Strip file extension
-
-      // Ensure unique file name
-      let fileName = baseFileName;
-      let counter = 1;
-      while (files[fileName]) {
-        fileName = `${baseFileName} (${counter++})`;
-      }
-
-      createFile(fileName); // Create the file
-      saveFile(fileName, content); // Save the file content
-    };
-
-    reader.onerror = () => {
-      alert("Failed to read the file. Please try again.");
-    };
-
-    reader.readAsText(file, "utf-8");
+    handleFileImport(file, files, createFile, saveFile);
   };
 
-  // Handle file export
+  // Handle file export using utility
   const exportFile = (format) => {
-    if (!activeFile) {
-      alert("No active file selected.");
-      return;
-    }
-
-    const content = files[activeFile];
-    let blob;
-    let fileExtension;
-
-    switch (format) {
-      case "markdown":
-        blob = new Blob([content], { type: "text/markdown" });
-        fileExtension = "md";
-        break;
-      case "html":
-        blob = new Blob([content], { type: "text/html" });
-        fileExtension = "html";
-        break;
-      case "styled html":
-        const styledContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>body { font-family: Arial, sans-serif; padding: 20px; }</style>
-        </head>
-        <body>
-          ${content}
-        </body>
-        </html>`;
-        blob = new Blob([styledContent], { type: "text/html" });
-        fileExtension = "html";
-        break;
-      case "pdf":
-        // Using jsPDF for PDF export (you need to install jsPDF first)
-
-        const doc = new jsPDF();
-        doc.text(content, 10, 10); // Basic example, improve as needed
-        doc.save(`${activeFile}.pdf`);
-        return;
-      default:
-        alert("Unsupported export format.");
-        return;
-    }
-
-    // Trigger file download
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${activeFile}.${fileExtension}`;
-    link.click();
-    URL.revokeObjectURL(url);
+    handleFileExport(activeFile, files, format);
   };
 
-  // Preview export
-  const previewExport = (format) => {
-    if (!activeFile) {
-      alert("No active file selected.");
-      return;
-    }
-
-    const content = files[activeFile];
-    const previewWindow = window.open("", "_blank");
-
-    switch (format) {
-      case "markdown":
-        previewWindow.document.write(
-          `<html><body><pre style="white-space: pre-wrap; font-family: Consolas, 'Courier New', monospace;">${content}</pre></body></html>`
-        );
-        break;
-      case "html":
-        previewWindow.document.write(`<html><body>${content}</body></html>`);
-        break;
-      case "styled html":
-        const styledContent = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <style>body { font-family: Arial, sans-serif; padding: 20px; }</style>
-          </head>
-          <body>
-            ${content}
-          </body>
-          </html>`;
-        previewWindow.document.write(styledContent);
-        break;
-      case "pdf":
-        // Generate PDF using jsPDF
-        const doc = new jsPDF();
-        doc.text(content, 10, 10); // Add content at position (10, 10)
-
-        // Create a Blob URL from the PDF content
-        const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        // Embed the PDF in an iframe for preview
-        previewWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>PDF Preview</title>
-          </head>
-          <body>
-            <h1>PDF Preview</h1>
-            <iframe src="${pdfUrl}" width="100%" height="100%" style="border: none;"></iframe>
-          </body>
-          </html>
-        `);
-        break;
-      default:
-        previewWindow.document.write(
-          `<html><body><p>Unsupported preview format.</p></body></html>`
-        );
-    }
-
-    previewWindow.document.close();
+  // Preview export using utility
+  const previewExportHandler = (format) => {
+    previewExport(activeFile, files, format);
   };
 
   return (
@@ -223,7 +81,7 @@ const App = () => {
         isSidePanelOpen={isSidePanelOpen}
         importFileContent={importFileContent}
         exportFile={exportFile}
-        previewExport={previewExport}
+        previewExport={previewExportHandler}
       />
       <div style={{ display: "flex", flex: 1 }}>
         <SidePanel
@@ -234,6 +92,7 @@ const App = () => {
           createFile={createFile}
           deleteFile={deleteFile}
           renameFile={renameFile}
+          toggleSidePanel={toggleSidePanel} // Pass down toggle function
         />
         <MainSection
           activeFile={activeFile}
