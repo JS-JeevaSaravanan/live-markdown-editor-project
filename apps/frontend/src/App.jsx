@@ -12,9 +12,9 @@ import {
 } from "./utils";
 
 const App = () => {
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // Default: sidebar is closed
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [activeFile, setActiveFile] = useState(null);
-  const [files, setFiles] = useState(() => loadFilesFromStorage()); // Use utility to load files from localStorage
+  const [files, setFiles] = useState(() => loadFilesFromStorage());
 
   const createFile = (fileName = "File 1", content = "") => {
     if (!fileName || files[fileName]) {
@@ -43,13 +43,13 @@ const App = () => {
     console.log('saveFile: ', fileName, content);
     setFiles((prevFiles) => {
       const updatedFiles = { ...prevFiles, [fileName]: content };
-      return saveFilesToStorage(updatedFiles); // Save files to localStorage
+      return saveFilesToStorage(updatedFiles);
     });
   }, []);
 
   const deleteFile = (fileName) => {
     const { [fileName]: _, ...rest } = files;
-    setFiles(saveFilesToStorage(rest)); // Save updated files to localStorage
+    setFiles(saveFilesToStorage(rest));
     if (activeFile === fileName)
       setActiveFile(files[Object.keys(rest)[0]] ? Object.keys(rest)[0] : null);
   };
@@ -65,17 +65,14 @@ const App = () => {
     if (activeFile === oldName) setActiveFile(newName);
   };
 
-  // Handle file import using utility
   const importFileContent = (file) => {
     handleFileImport(file, files, createFile, saveFile);
   };
 
-  // Handle file export using utility
   const exportFile = (format) => {
     handleFileExport(activeFile, files, format);
   };
 
-  // Preview export using utility
   const previewExportHandler = (format) => {
     previewExport(activeFile, files, format);
   };
@@ -120,6 +117,7 @@ const App = () => {
           saveFile={saveFile}
           isSidePanelOpen={isSidePanelOpen}
         />
+        
       </div>
       <Footer />
     </div>

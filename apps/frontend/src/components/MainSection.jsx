@@ -2,129 +2,142 @@ import { useState, useEffect, useRef } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import MarkdownHTMLPreview from "./MarkdownHTMLPreview";
 
-const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
-  const [markdown, setMarkdown] = useState(content || ""); // State for markdown input
-  const [htmlOutput, setHtmlOutput] = useState(""); // State for the HTML output
-  const [loading, setLoading] = useState(false); // State to show loading indicator
-  const [socketStatus, setSocketStatus] = useState("disconnected"); // WebSocket status
+const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen, footerHeight = 50 }) => {
+  const [markdown, setMarkdown] = useState(content || "");
+  const [htmlOutput, setHtmlOutput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [socketStatus, setSocketStatus] = useState("disconnected");
 
-  const { debouncedValue, setDebouncedValue } = useDebounce(markdown, 50); // Debounced markdown value
-  const socketRef = useRef(null); // Ref to hold WebSocket instance
+  const { debouncedValue, setDebouncedValue } = useDebounce(markdown, 50);
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    console.log("MainSection rendered", activeFile, content);
     const newContent = content || "";
-    setMarkdown(newContent); // Sync markdown state with the content prop
-    // setDebouncedValue(newContent)
+    setMarkdown(newContent);
     if (newContent !== debouncedValue) {
       setDebouncedValue(newContent);
     }
-  }, [content, activeFile]);
+  }, [content]);
 
-  // Effect for WebSocket connection
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:5002");
     socketRef.current = socket;
 
     socket.onopen = () => {
       setSocketStatus("connected");
-      console.log("WebSocket connection established");
     };
 
     socket.onmessage = (event) => {
-      setHtmlOutput(event.data); // Set the HTML output from WebSocket
-      setLoading(false); // Hide loading indicator
+      setHtmlOutput(event.data);
+      setLoading(false);
     };
 
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
+    socket.onerror = () => {
       setSocketStatus("error");
     };
 
     socket.onclose = () => {
       setSocketStatus("disconnected");
-      console.log("WebSocket connection closed");
     };
 
     return () => {
-      socket.close(); // Cleanup WebSocket connection on unmount
+      socket.close();
     };
   }, []);
 
-  // Effect to send debounced markdown to WebSocket server
   useEffect(() => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(debouncedValue); // Send markdown to WebSocket server
-      setLoading(true); // Show loading indicator while waiting for response
+      socketRef.current.send(debouncedValue);
+      setLoading(true);
     }
   }, [debouncedValue]);
 
-  // Save debounced markdown content when it changes
   useEffect(() => {
     if (activeFile && debouncedValue !== content) {
-      saveFile(activeFile, debouncedValue); // Save to parent state only if the content changed
+      saveFile(activeFile, debouncedValue);
     }
   }, [debouncedValue, saveFile]);
 
   const handleInputChange = (e) => {
-    setMarkdown(e.target.value); // Update markdown text state on input change
+    setMarkdown(e.target.value);
   };
 
   const styles = {
     container: {
       display: "flex",
       width: "100%",
-      justifyContent: "space-between",
-      backgroundColor: "#1e1e1e",
-      color: "#dcdcdc",
+      backgroundColor: "#1e1e1e", // Dark background
+      color: "#dcdcdc", // Light text color
       fontFamily: "Consolas, 'Courier New', monospace",
-      marginLeft: isSidePanelOpen ? "200px" : "0",
+      marginLeft: isSidePanelOpen ? "270px" : "0", // Offset by side panel width when open
+      transition: "margin-left 0.3s ease", // Smooth transition
+      padding: "20px",
+      height: `calc(100vh - ${footerHeight}px)`, // Adjust height to not overflow footer
+      overflow: "hidden", // Prevent body scroll
     },
     textarea: {
-      width: isSidePanelOpen ? "50%" : "100%",
-      height: "90vh",
+      flex: 1, // Let the textarea take up available space
+      height: "80vh",// Ensure full height without overflowing
       fontSize: "16px",
-      padding: "15px",
+      padding: "20px 15px", // Top and bottom padding added, left-right padding remains 15px
       border: "none",
       outline: "none",
       borderRadius: "4px",
       resize: "none",
-      backgroundColor: "#252526",
+      backgroundColor: "#252526", // Dark background for editor
       color: "#dcdcdc",
       boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
+      transition: "width 0.3s ease", // Smooth transition when side panel opens
+      overflowY: "auto", // Make textarea scrollable if content exceeds height
     },
     htmlOutput: {
-      width: isSidePanelOpen ? "50%" : "100%",
-      height: "90vh",
-      overflowY: "auto",
-      padding: "15px",
-      backgroundColor: "#1e1e1e",
-      borderLeft: "1px solid #333",
+      flex: 1, // Let the output area take up available space
+      height: "80vh", // Ensure full height without overflowing
+      overflowY: "auto", // Make output scrollable when content exceeds height
+      padding: "20px", // Padding applied consistently here
+      backgroundColor: "#1e1e1e", // Dark background for preview
+      borderLeft: "1px solid #333", // Divider between editor and preview
       color: "#dcdcdc",
       fontSize: "16px",
+      boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
+      transition: "width 0.3s ease", // Smooth transition when side panel opens
     },
     loading: {
       color: "#888",
       fontStyle: "italic",
     },
+    socketStatus: {
+      color: socketStatus === "connected" ? "#4caf50" : "#f44336",
+      fontWeight: "bold",
+      marginTop: "10px",
+    },
   };
 
   return (
     <div style={styles.container}>
-      {/* Markdown Textarea */}
-      <textarea
-        style={styles.textarea}
-        value={markdown}
-        onChange={handleInputChange}
-        placeholder="Type Markdown here..."
-      />
+      {/* Textarea editor */}
+      {!isSidePanelOpen && (
+        <textarea
+          style={styles.textarea}
+          value={markdown}
+          onChange={handleInputChange}
+          placeholder="Type Markdown here..."
+        />
+      )}
 
-      {/* HTML Output */}
+      {/* HTML output preview */}
       <div style={styles.htmlOutput}>
         {loading ? (
           <p style={styles.loading}>Converting...</p>
         ) : (
           <MarkdownHTMLPreview htmlOutput={htmlOutput} />
+        )}
+        {socketStatus !== "connected" && (
+          <p style={styles.socketStatus}>
+            {socketStatus === "disconnected"
+              ? "Socket Connection Failed. Refresh Page!"
+              : `Socket Status: ${socketStatus}`}
+          </p>
         )}
       </div>
     </div>
