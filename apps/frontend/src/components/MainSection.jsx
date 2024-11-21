@@ -8,12 +8,17 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
   const [loading, setLoading] = useState(false); // State to show loading indicator
   const [socketStatus, setSocketStatus] = useState("disconnected"); // WebSocket status
 
-  const debouncedValue = useDebounce(markdown, 50); // Debounced markdown value
+  const { debouncedValue, setDebouncedValue } = useDebounce(markdown, 50); // Debounced markdown value
   const socketRef = useRef(null); // Ref to hold WebSocket instance
 
   useEffect(() => {
     console.log("MainSection rendered", activeFile, content);
-    setMarkdown(content || ""); // Sync markdown state with the content prop
+    const newContent = content || "";
+    setMarkdown(newContent); // Sync markdown state with the content prop
+    // setDebouncedValue(newContent)
+    if (newContent !== debouncedValue) {
+      setDebouncedValue(newContent);
+    }
   }, [content, activeFile]);
 
   // Effect for WebSocket connection
@@ -59,7 +64,7 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
     if (activeFile && debouncedValue !== content) {
       saveFile(activeFile, debouncedValue); // Save to parent state only if the content changed
     }
-  }, [debouncedValue, activeFile, content, saveFile]);
+  }, [debouncedValue, saveFile]);
 
   const handleInputChange = (e) => {
     setMarkdown(e.target.value); // Update markdown text state on input change
