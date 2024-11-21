@@ -49,7 +49,6 @@ husky
 lint-staged
 commitlint
 
-
 logger
 
 Error handlings:
@@ -72,7 +71,6 @@ Security:
 - **Logging**: Use a logging library like **winston** or **morgan** to track API requests and any potential issues.
 - **Monitoring**: Consider implementing application performance monitoring (APM) to track performance, errors, and usage.
 
-
-light and dark mode implementation... 
+light and dark mode implementation...
 
 file and folder structure revamp...

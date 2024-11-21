@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useDebounce } from "./customHooks";
+import { useDebounce } from "../hooks/useDebounce";
 import MarkdownHTMLPreview from "./MarkdownHTMLPreview";
 
 const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {

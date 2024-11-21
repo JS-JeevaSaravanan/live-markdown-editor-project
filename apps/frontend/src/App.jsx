@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import Header from "./Header";
-import SidePanel from "./SidePanel";
-import MainSection from "./MainSection";
-import Footer from "./Footer";
+import Header from "./components/Header";
+import SidePanel from "./components/SidePanel";
+import MainSection from "./components/MainSection";
+import Footer from "./components/Footer";
 import { jsPDF } from "jspdf";
 
 const App = () => {
