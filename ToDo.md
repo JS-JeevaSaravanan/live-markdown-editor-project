@@ -1,83 +1,67 @@
-https://pandao.github.io/editor.md/en.html
 
-dillinger.io
+### Highlightings:
+- **Code Block Support**
+- **Quote Block Support**
+- **Table Support**
 
-https://onlinemarkdowneditor.dev/collaboration/#doce0df025579
+### Features:
+- Support **multiple files**
+- **Local Storage** for file persistence
+- **Font Color Change**
+- **Code View** and **Preview** modes
+- **Import and Export** files
+- **Document File Name Editing**
+- **Create & Delete Files**
+- Implement **Keyboard Shortcuts**
+- **Theme Change** (Light/Dark mode)
+- **Font Size Change**
+- **Font Family Change**
+- **Line Numbers** in code view
+- **Word Wrap** in code view
+- **Search & Replace** functionality
+- **Full Screen Zen Mode**
 
-Highlightings:
+### Bugs:
+- Fix **socketStatus** variable usage
+- Improve **error handling** & UI feedback when socket fails or is unavailable
 
-- code block
-- quote block
-- table
+### To Check:
+- Investigate if **max request limit** can be increased
+- Implement **compress and decompress** in socket communication
+- **Comment out backend cache**
 
-Features:
+### Tech Setup:
+- **TypeScript**
+- **ESLint**
+- **Prettier**
+- **Husky**
+- **Lint-staged**
+- **Commitlint**
+- **Logger** setup
 
-- multiple files
-- local storage
-- font color changes
-- code view and preview
-- import and export
-- document file name and edit
-- delete and create file
-- keyboard shortcut
-- theme change
-- font size change
-- font family change
-- line number
-- word wrap
-- search and replace
-- full screen zen mode
+### Error Handling:
+- **Input Validation** for Markdown
+  - Handle edge cases (empty or malformed Markdown)
+- **Server-Side Error Handling** (Markdown conversion errors, missing content)
+- **Input Bar Errors**: Validate and handle errors in input fields
+- **Socket Errors**: Improve socket error handling
+- **Backend Logic Errors**: Handle errors from backend processes
 
-Bugs:
+### Security:
+- **Sanitization** of converted HTML (Prevent XSS using libraries like **DOMPurify**)
+- Implement **Content Security Policy (CSP)** to prevent malicious injections
 
-File changes:
+### Logging and Monitoring (Optional):
+- Set up **Logging** with libraries like **Winston** or **Morgan**
+- Implement **Application Performance Monitoring (APM)** to track errors and performance
 
-- socketstatus variable useage
-- error handling and UI intimation - when socket failed or not worked
+### UI/UX Enhancements:
+- Implement **Light and Dark Mode** support
+- **File and Folder Structure Revamp** for better organization
+- Expose **environment variables** and remove sensitive data
+- Ensure **items order** in local storage is maintained
+- Ensure **active file content re-render** after changes
 
-To check:
-
-- max request limit can be increased
-- compress and decompress in socketing..
-
-- comment backend cache..
-
-typescript
-eslint
-prettier
-husky
-lint-staged
-commitlint
-
-logger
-
-Error handlings:
-
-- input bars
-- socket
-- backend logics
-
-**Input Validation**: Ensure the input Markdown is valid and handle edge cases (e.g., empty input or malformed Markdown).
-
-- **Error Handling**: Properly handle errors on the server side (e.g., if Markdown fails to convert for some reason, or if there's no content sent in the request).
-
-Security:
-**Sanitization**: Ensure the converted HTML is sanitized to prevent any security vulnerabilities like **XSS (Cross-Site Scripting)** attacks. Libraries like **DOMPurify** can be used to sanitize the HTML output before sending it to the client.
-
-- **Content Security Policy (CSP)**: Use a CSP to prevent malicious content from being injected into your application.
-
-### 7. **Logging and Monitoring (Optional)**
-
-- **Logging**: Use a logging library like **winston** or **morgan** to track API requests and any potential issues.
-- **Monitoring**: Consider implementing application performance monitoring (APM) to track performance, errors, and usage.
-
-light and dark mode implementation...
-
-file and folder structure revamp...
-
-env variables exposed, to remove them...
-
-import export functionalities..
-host in somewhere..
-items order and local storage update..
-active item content re-render..
+### Additional Tasks:
+- **Import/Export** functionalities for file handling
+- Host the application on a suitable platform
