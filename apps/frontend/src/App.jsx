@@ -40,7 +40,6 @@ const App = () => {
   };
 
   const saveFile = useCallback((fileName, content) => {
-    console.log('saveFile: ', fileName, content);
     setFiles((prevFiles) => {
       const updatedFiles = { ...prevFiles, [fileName]: content };
       return saveFilesToStorage(updatedFiles);
@@ -117,7 +116,6 @@ const App = () => {
           saveFile={saveFile}
           isSidePanelOpen={isSidePanelOpen}
         />
-        
       </div>
       <Footer />
     </div>

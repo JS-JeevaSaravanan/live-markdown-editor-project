@@ -1,23 +1,23 @@
 const Footer = () => {
   const styles = {
     footer: {
-      backgroundColor: "#1e1e1e", // Dark gray background
-      color: "#f5f5f5", // Light text for contrast
+      backgroundColor: "#1e1e1e",
+      color: "#f5f5f5",
       padding: "10px 20px",
       textAlign: "right",
-      fontFamily: "Consolas, 'Courier New', monospace", // Coding-style font
-      fontSize: "14px", // Subtle font size for footer
-      borderTop: "1px solid #444", // Lighter and thinner border
-      marginTop: "auto", // Ensures it stays at the bottom
+      fontFamily: "Consolas, 'Courier New', monospace",
+      fontSize: "14px",
+      borderTop: "1px solid #444",
+      marginTop: "auto",
     },
     link: {
-      color: "#007acc", // Vibrant blue for links
+      color: "#007acc",
       textDecoration: "none",
       fontWeight: "bold",
       transition: "color 0.3s ease",
     },
     linkHover: {
-      color: "#005f99", // Darker blue on hover
+      color: "#005f99",
     },
   };
 

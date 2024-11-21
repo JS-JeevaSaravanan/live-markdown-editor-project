@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
-// Component for rendering markdown HTML preview
 const MarkdownHTMLPreview = ({ htmlOutput }) => {
   const [renderedOutput, setRenderedOutput] = useState([]);
 
@@ -13,14 +12,12 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
       const elements = Array.from(tempDiv.childNodes).map((node, index) =>
         handleNode(node, index)
       );
-
       setRenderedOutput(elements);
     };
 
     processHtmlOutput();
   }, [htmlOutput]);
 
-  // Helper function to handle different node types
   const handleNode = (node, index) => {
     switch (node.tagName) {
       case "PRE":
@@ -54,7 +51,6 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     }
   };
 
-  // Render a code block
   const handleCodeBlock = (node, index) => {
     const codeBlock = node.querySelector("code");
     const language =
@@ -74,14 +70,12 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     );
   };
 
-  // Render blockquote
   const handleBlockquote = (node, index) => (
     <blockquote key={index} style={styles.blockquote}>
       {node.textContent}
     </blockquote>
   );
 
-  // Render headings (H1-H6)
   const handleHeading = (node, index) => {
     const level = parseInt(node.tagName.replace("H", ""), 10);
     return (
@@ -94,7 +88,6 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     );
   };
 
-  // Render list (UL/OL)
   const handleList = (node, index) => (
     <div
       key={index}
@@ -103,26 +96,22 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     />
   );
 
-  // Render list item (LI)
   const handleListItem = (node, index) => (
     <li key={index} style={styles.listItem}>
       {node.textContent}
     </li>
   );
 
-  // Render image
   const handleImage = (node, index) => (
     <img key={index} src={node.src} alt={node.alt || ""} style={styles.image} />
   );
 
-  // Render link
   const handleLink = (node, index) => (
     <a key={index} href={node.href} style={styles.link}>
       {node.textContent}
     </a>
   );
 
-  // Render table
   const handleTable = (node, index) => (
     <table key={index} style={styles.table}>
       {Array.from(node.children).map((child, childIndex) =>
@@ -131,7 +120,6 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     </table>
   );
 
-  // Render table header and body
   const renderTableChild = (child, childIndex) => {
     if (child.tagName === "THEAD") {
       return (
@@ -154,7 +142,6 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     return null;
   };
 
-  // Render table rows
   const renderTableRow = (row, rowIndex, cellType) => (
     <tr key={rowIndex} style={styles.tableRow}>
       {Array.from(row.children).map((cell, cellIndex) => {
@@ -173,17 +160,14 @@ const MarkdownHTMLPreview = ({ htmlOutput }) => {
     </tr>
   );
 
-  // Render horizontal rule (HR)
   const handleHorizontalRule = (index) => <hr key={index} style={styles.hr} />;
 
-  // Render paragraph
   const handleParagraph = (node, index) => (
     <p key={index} style={styles.paragraph}>
       {node.textContent}
     </p>
   );
 
-  // Render default node
   const handleDefaultNode = (node, index) => (
     <div
       key={index}

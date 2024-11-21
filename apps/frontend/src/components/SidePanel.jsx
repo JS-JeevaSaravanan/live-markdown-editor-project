@@ -29,13 +29,13 @@ const SidePanel = ({
       transform: isOpen ? "translateX(0)" : "translateX(-100%)",
       fontFamily: "Consolas, 'Courier New', monospace",
       overflowY: "auto",
-      maxHeight: "100vh", // Prevent side panel from growing too tall
+      maxHeight: "100vh",
       display: "flex",
       flexDirection: "column",
     },
     fileList: {
-      overflowY: "auto", // Make the file list scrollable
-      flex: 1, // Allow file list to take all available space
+      overflowY: "auto",
+      flex: 1,
     },
     fileItem: {
       padding: "8px 12px",
@@ -47,7 +47,7 @@ const SidePanel = ({
       alignItems: "center",
       justifyContent: "space-between",
       transition: "background-color 0.3s ease",
-      wordBreak: "break-word", // Prevent overflow for long file names
+      wordBreak: "break-word",
     },
     activeFile: {
       backgroundColor: "#007acc",
@@ -67,7 +67,7 @@ const SidePanel = ({
       backgroundColor: "#2a2a2a",
       color: "#f5f5f5",
       fontSize: "14px",
-      boxSizing: "border-box", // Ensure the padding doesn't overflow
+      boxSizing: "border-box",
     },
     button: {
       padding: "8px 12px",
@@ -93,7 +93,7 @@ const SidePanel = ({
       transition: "color 0.2s ease",
     },
     iconButtonHover: {
-      color: "#007acc", // On hover, icons turn blue
+      color: "#007acc",
     },
     closeButton: {
       position: "absolute",
@@ -125,10 +125,10 @@ const SidePanel = ({
       fontStyle: "italic",
     },
     createFileSection: {
-      marginTop: "auto", // Push input and button to the bottom
+      marginTop: "auto",
     },
     disabledButton: {
-      backgroundColor: "#555", // Disabled state background color
+      backgroundColor: "#555",
       cursor: "not-allowed",
     },
     tooltip: {
@@ -145,7 +145,6 @@ const SidePanel = ({
     },
   };
 
-  // Helper function to check if a name is taken
   const isFileNameTaken = (name) => {
     return Object.keys(files).includes(name.trim());
   };
@@ -154,7 +153,6 @@ const SidePanel = ({
     if (newFileName.trim()) {
       createFile(newFileName.trim());
       setNewFileName("");
-      // setActiveFile(newFileName.trim()); // Set newly created file as active
     }
   };
 
@@ -170,7 +168,6 @@ const SidePanel = ({
     }
   };
 
-  // Disable delete button for the last file
   const isDeleteDisabled = Object.keys(files).length <= 1;
 
   return (
@@ -229,7 +226,6 @@ const SidePanel = ({
                     ✏️
                   </button>
                 )}
-                {/* Disable delete button for the last item */}
                 {!isDeleteDisabled && (
                   <button
                     style={{
@@ -265,7 +261,7 @@ const SidePanel = ({
             ...(isFileNameTaken(newFileName) && styles.disabledButton),
           }}
           onClick={handleCreateFile}
-          disabled={isFileNameTaken(newFileName)} // Disable button if file name is taken
+          disabled={isFileNameTaken(newFileName)}
           title={isFileNameTaken(newFileName) ? "File name already exists" : ""}
         >
           Create New File

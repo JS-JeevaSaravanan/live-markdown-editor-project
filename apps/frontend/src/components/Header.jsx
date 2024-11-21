@@ -7,7 +7,7 @@ const Header = ({
   previewExport,
   activeFile,
 }) => {
-  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false); // Toggle export menu visibility
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
   const styles = {
     header: {
@@ -19,35 +19,35 @@ const Header = ({
       justifyContent: "space-between",
       fontFamily: "Consolas, 'Courier New', monospace",
       borderBottom: "1px solid #333",
-      position: "relative", // For the dropdown menu
+      position: "relative",
     },
     headerTitleContainer: {
       display: "flex",
       alignItems: "center",
-      gap: "15px", // Slightly more space between title and file name
+      gap: "15px",
     },
     headerTitle: {
       fontSize: "22px",
       margin: 0,
       fontWeight: "bold",
-      flex: 1, // Makes the title take up available space on the left
+      flex: 1,
       cursor: "default",
     },
     activeFileName: {
       fontSize: "14px",
-      color: "#b3b3b3", // Lighter color for the active file name
+      color: "#b3b3b3",
       fontStyle: "italic",
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
-      maxWidth: "200px", // Limit the width of the file name container
+      maxWidth: "200px",
       cursor: "default",
     },
     controls: {
       display: "flex",
-      gap: "20px", // Add more space between controls
+      gap: "20px",
       alignItems: "center",
-      justifyContent: "flex-end", // Aligns the buttons to the right
+      justifyContent: "flex-end",
     },
     fileInput: {
       display: "none",
@@ -64,25 +64,29 @@ const Header = ({
       transition: "background-color 0.3s ease",
       display: "flex",
       alignItems: "center",
-      gap: "8px", // Added space for icon and text
+      gap: "8px",
     },
     toggleButtonHover: {
       backgroundColor: "#005f99",
     },
     dropdownMenu: {
       position: "absolute",
-      top: "50px",
-      right: "20px",
+      top: "40px",
+      right: "0",
       backgroundColor: "#1e1e1e",
       color: "#f5f5f5",
       border: "1px solid #333",
       borderRadius: "4px",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
       zIndex: 1000,
-      width: "160px",
+      width: "200px",
       display: isExportMenuOpen ? "block" : "none",
+      padding: "5px 0",
     },
     dropdownItem: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
       padding: "10px 15px",
       cursor: "pointer",
       fontFamily: "Consolas, 'Courier New', monospace",
@@ -90,11 +94,12 @@ const Header = ({
       borderBottom: "1px solid #333",
       transition: "background-color 0.2s ease",
     },
+
     dropdownItemHover: {
       backgroundColor: "#333",
     },
     hamburgerButton: {
-      fontSize: "30px", // Larger size for better visibility
+      fontSize: "30px",
       backgroundColor: "transparent",
       color: "#fff",
       border: "none",
@@ -103,7 +108,7 @@ const Header = ({
       transition: "transform 0.3s ease",
     },
     hamburgerButtonHover: {
-      transform: "scale(1.2)", // Add a scaling effect on hover
+      transform: "scale(1.2)",
     },
   };
 
@@ -116,14 +121,13 @@ const Header = ({
   };
 
   const handleExport = (format) => {
-    exportFile(format); // Trigger the export action
-    setIsExportMenuOpen(false); // Close the export menu after selection
+    exportFile(format);
+    setIsExportMenuOpen(false);
   };
 
   return (
     <header style={styles.header}>
       <div style={styles.headerTitleContainer}>
-        {/* Hamburger Menu Button */}
         <button
           style={{ ...styles.hamburgerButton, ...styles.hamburgerButtonHover }}
           onClick={toggleSidePanel}
@@ -132,14 +136,10 @@ const Header = ({
         >
           ☰
         </button>
-        {/* Markdown Editor Title */}
-        <h1 style={styles.headerTitle}>
-          {`${activeFile} 📄`}
-        </h1>
+        <h1 style={styles.headerTitle}>{`${activeFile} 📄`}</h1>
       </div>
 
       <div style={styles.controls}>
-        {/* Import Button */}
         <label htmlFor="file-input" style={styles.toggleButton}>
           <span>Import</span>
           <input
@@ -154,7 +154,6 @@ const Header = ({
           />
         </label>
 
-        {/* Export Dropdown Button */}
         <button
           style={styles.toggleButton}
           onClick={() => setIsExportMenuOpen((prev) => !prev)}
@@ -164,7 +163,6 @@ const Header = ({
           Export
         </button>
 
-        {/* Export Menu (Dropdown) */}
         <div style={styles.dropdownMenu}>
           {["Markdown", "HTML", "Styled HTML", "PDF"].map((format) => (
             <div

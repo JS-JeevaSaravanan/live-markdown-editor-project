@@ -1,19 +1,15 @@
 import { jsPDF } from "jspdf";
 
-// Utility function to load files from localStorage
 export const loadFilesFromStorage = () => {
   const storedFiles = localStorage.getItem("markdownFiles");
   return storedFiles ? JSON.parse(storedFiles) : {};
 };
 
-// Utility function to save files to localStorage
 export const saveFilesToStorage = (files) => {
-  console.log('saveFilesToStorage: ', files);
   localStorage.setItem("markdownFiles", JSON.stringify(files));
   return loadFilesFromStorage();
 };
 
-// Utility function to create a unique file name
 export const generateUniqueFileName = (baseFileName, existingFiles) => {
   let fileName = baseFileName;
   let counter = 1;
@@ -23,7 +19,6 @@ export const generateUniqueFileName = (baseFileName, existingFiles) => {
   return fileName;
 };
 
-// Utility function to handle file import
 export const handleFileImport = (file, files, createFile, saveFile) => {
   if (!file) {
     alert("No file selected.");
@@ -45,11 +40,9 @@ export const handleFileImport = (file, files, createFile, saveFile) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const content = e.target.result;
-    let baseFileName = file.name.replace(/\.[^/.]+$/, ""); // Strip file extension
-
-    const uniqueFileName = generateUniqueFileName(baseFileName, files); // Ensure unique file name
-    createFile(uniqueFileName, content); // Create the file
-    // saveFile(uniqueFileName, content); // Save the file content
+    let baseFileName = file.name.replace(/\.[^/.]+$/, "");
+    const uniqueFileName = generateUniqueFileName(baseFileName, files);
+    createFile(uniqueFileName, content);
   };
 
   reader.onerror = () => {
@@ -59,7 +52,6 @@ export const handleFileImport = (file, files, createFile, saveFile) => {
   reader.readAsText(file, "utf-8");
 };
 
-// Utility function to handle file export
 export const handleFileExport = (activeFile, files, format) => {
   if (!activeFile) {
     alert("No active file selected.");
@@ -95,7 +87,7 @@ export const handleFileExport = (activeFile, files, format) => {
       break;
     case "pdf":
       const doc = new jsPDF();
-      doc.text(content, 10, 10); // Basic example, improve as needed
+      doc.text(content, 10, 10);
       doc.save(`${activeFile}.pdf`);
       return;
     default:
@@ -103,7 +95,6 @@ export const handleFileExport = (activeFile, files, format) => {
       return;
   }
 
-  // Trigger file download
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -112,7 +103,6 @@ export const handleFileExport = (activeFile, files, format) => {
   URL.revokeObjectURL(url);
 };
 
-// Utility function to preview the export
 export const previewExport = (activeFile, files, format) => {
   if (!activeFile) {
     alert("No active file selected.");
@@ -146,13 +136,10 @@ export const previewExport = (activeFile, files, format) => {
       break;
     case "pdf":
       const doc = new jsPDF();
-      doc.text(content, 10, 10); // Add content at position (10, 10)
-
-      // Create a Blob URL from the PDF content
+      doc.text(content, 10, 10);
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
-      // Embed the PDF in an iframe for preview
       previewWindow.document.write(`
         <!DOCTYPE html>
         <html>

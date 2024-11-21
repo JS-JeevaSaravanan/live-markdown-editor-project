@@ -2,7 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import MarkdownHTMLPreview from "./MarkdownHTMLPreview";
 
-const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen, footerHeight = 50 }) => {
+const MainSection = ({
+  activeFile,
+  content,
+  saveFile,
+  isSidePanelOpen,
+  footerHeight = 50,
+}) => {
   const [markdown, setMarkdown] = useState(content || "");
   const [htmlOutput, setHtmlOutput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -66,41 +72,41 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen, footerHei
     container: {
       display: "flex",
       width: "100%",
-      backgroundColor: "#1e1e1e", // Dark background
-      color: "#dcdcdc", // Light text color
+      backgroundColor: "#1e1e1e",
+      color: "#dcdcdc",
       fontFamily: "Consolas, 'Courier New', monospace",
-      marginLeft: isSidePanelOpen ? "270px" : "0", // Offset by side panel width when open
-      transition: "margin-left 0.3s ease", // Smooth transition
+      marginLeft: isSidePanelOpen ? "270px" : "0",
+      transition: "margin-left 0.3s ease",
       padding: "20px",
-      height: `calc(100vh - ${footerHeight}px)`, // Adjust height to not overflow footer
-      overflow: "hidden", // Prevent body scroll
+      height: `calc(100vh - ${footerHeight}px)`,
+      overflow: "hidden",
     },
     textarea: {
-      flex: 1, // Let the textarea take up available space
-      height: "80vh",// Ensure full height without overflowing
+      flex: 1,
+      height: "80vh",
       fontSize: "16px",
-      padding: "20px 15px", // Top and bottom padding added, left-right padding remains 15px
+      padding: "20px 15px",
       border: "none",
       outline: "none",
       borderRadius: "4px",
       resize: "none",
-      backgroundColor: "#252526", // Dark background for editor
+      backgroundColor: "#252526",
       color: "#dcdcdc",
       boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
-      transition: "width 0.3s ease", // Smooth transition when side panel opens
-      overflowY: "auto", // Make textarea scrollable if content exceeds height
+      transition: "width 0.3s ease",
+      overflowY: "auto",
     },
     htmlOutput: {
-      flex: 1, // Let the output area take up available space
-      height: "80vh", // Ensure full height without overflowing
-      overflowY: "auto", // Make output scrollable when content exceeds height
-      padding: "20px", // Padding applied consistently here
-      backgroundColor: "#1e1e1e", // Dark background for preview
-      borderLeft: "1px solid #333", // Divider between editor and preview
+      flex: 1,
+      height: "80vh",
+      overflowY: "auto",
+      padding: "20px",
+      backgroundColor: "#1e1e1e",
+      borderLeft: "1px solid #333",
       color: "#dcdcdc",
       fontSize: "16px",
       boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
-      transition: "width 0.3s ease", // Smooth transition when side panel opens
+      transition: "width 0.3s ease",
     },
     loading: {
       color: "#888",
@@ -115,7 +121,6 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen, footerHei
 
   return (
     <div style={styles.container}>
-      {/* Textarea editor */}
       {!isSidePanelOpen && (
         <textarea
           style={styles.textarea}
@@ -124,8 +129,6 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen, footerHei
           placeholder="Type Markdown here..."
         />
       )}
-
-      {/* HTML output preview */}
       <div style={styles.htmlOutput}>
         {loading ? (
           <p style={styles.loading}>Converting...</p>
