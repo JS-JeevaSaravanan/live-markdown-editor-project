@@ -45,7 +45,7 @@ yarn run dev
 ```
 
 - The frontend will be available at [http://localhost:3000](http://localhost:3000).
-- The backend server (if used) will run at [http://localhost:5002](http://localhost:5002).
+- The backend server will run at [http://localhost:5002](http://localhost:5002).
 
 ## File Structure
 
