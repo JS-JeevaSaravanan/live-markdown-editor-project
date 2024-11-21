@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useDebounce } from "./customHooks";
+import MarkdownHTMLPreview from "./MarkdownHTMLPreview";
 
 const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
   const [markdown, setMarkdown] = useState(content || ""); // State for markdown input
@@ -10,7 +11,6 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
   const debouncedValue = useDebounce(markdown, 50); // Debounced markdown value
   const socketRef = useRef(null); // Ref to hold WebSocket instance
 
-  // Update markdown state when content changes
   useEffect(() => {
     setMarkdown(content || ""); // Sync markdown state with the content prop
   }, [content, activeFile]);
@@ -65,33 +65,45 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
   };
 
   const styles = {
+    container: {
+      display: "flex",
+      width: "100%",
+      justifyContent: "space-between",
+      backgroundColor: "#1e1e1e",
+      color: "#dcdcdc",
+      fontFamily: "Consolas, 'Courier New', monospace",
+    },
     textarea: {
       width: isSidePanelOpen ? "50%" : "100%",
       height: "90vh",
       fontSize: "16px",
-      padding: "10px",
-      border: "1px solid #ddd",
+      padding: "15px",
+      border: "none",
+      outline: "none",
       borderRadius: "4px",
       resize: "none",
+      backgroundColor: "#252526",
+      color: "#dcdcdc",
+      boxShadow: "inset 0 0 10px rgba(0,0,0,0.5)",
     },
     htmlOutput: {
       width: isSidePanelOpen ? "50%" : "100%",
       height: "90vh",
       overflowY: "auto",
-      border: "1px solid #ddd",
-      padding: "10px",
-      backgroundColor: "#f9f9f9",
+      padding: "15px",
+      backgroundColor: "#1e1e1e",
+      borderLeft: "1px solid #333",
+      color: "#dcdcdc",
+      fontSize: "16px",
+    },
+    loading: {
+      color: "#888",
+      fontStyle: "italic",
     },
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        justifyContent: "space-between",
-      }}
-    >
+    <div style={styles.container}>
       {/* Markdown Textarea */}
       <textarea
         style={styles.textarea}
@@ -103,9 +115,9 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
       {/* HTML Output */}
       <div style={styles.htmlOutput}>
         {loading ? (
-          <p style={{ color: "#888" }}>Converting...</p>
+          <p style={styles.loading}>Converting...</p>
         ) : (
-          <div dangerouslySetInnerHTML={{ __html: htmlOutput }} />
+          <MarkdownHTMLPreview htmlOutput={htmlOutput} />
         )}
       </div>
     </div>
