@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Header from "./components/Header";
 import SidePanel from "./components/SidePanel";
 import MainSection from "./components/MainSection";
@@ -16,6 +16,22 @@ const App = () => {
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false); // Default: sidebar is closed
   const [activeFile, setActiveFile] = useState(null);
   const [files, setFiles] = useState(() => loadFilesFromStorage()); // Use utility to load files from localStorage
+
+  // Set the first file as active on mount or create a new one
+  useEffect(() => {
+    if (Object.keys(files).length === 0) {
+      // No files, create the first one
+      const newFileName = "File 1";
+      const updatedFiles = { [newFileName]: "" };
+      setFiles(updatedFiles);
+      saveFilesToStorage(updatedFiles);
+      setActiveFile(newFileName); // Set newly created file as active
+    } else {
+      // If files exist, set the first one as active
+      const firstFile = Object.keys(files)[0];
+      setActiveFile(firstFile);
+    }
+  }, [files]);
 
   const toggleSidePanel = () => {
     setIsSidePanelOpen((prev) => !prev);
@@ -75,15 +91,29 @@ const App = () => {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", flexDirection: "column" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        margin: 0,
+        overflow: "hidden",
+      }}
+    >
       <Header
+        activeFile={activeFile}
         toggleSidePanel={toggleSidePanel}
-        isSidePanelOpen={isSidePanelOpen}
         importFileContent={importFileContent}
         exportFile={exportFile}
         previewExport={previewExportHandler}
       />
-      <div style={{ display: "flex", flex: 1 }}>
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
         <SidePanel
           isOpen={isSidePanelOpen}
           files={files}
@@ -92,7 +122,7 @@ const App = () => {
           createFile={createFile}
           deleteFile={deleteFile}
           renameFile={renameFile}
-          toggleSidePanel={toggleSidePanel} // Pass down toggle function
+          toggleSidePanel={toggleSidePanel}
         />
         <MainSection
           activeFile={activeFile}

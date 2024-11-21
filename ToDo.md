@@ -75,5 +75,9 @@ light and dark mode implementation...
 
 file and folder structure revamp...
 
-
 env variables exposed, to remove them...
+
+import export functionalities..
+host in somewhere..
+items order and local storage update..
+active item content re-render..

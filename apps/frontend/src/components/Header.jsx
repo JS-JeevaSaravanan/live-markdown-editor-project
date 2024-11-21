@@ -2,10 +2,10 @@ import { useState } from "react";
 
 const Header = ({
   toggleSidePanel,
-  isSidePanelOpen,
   importFileContent,
   exportFile,
   previewExport,
+  activeFile,
 }) => {
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false); // Toggle export menu visibility
 
@@ -19,17 +19,33 @@ const Header = ({
       justifyContent: "space-between",
       fontFamily: "Consolas, 'Courier New', monospace",
       borderBottom: "1px solid #333",
-      position: "relative", // for the dropdown menu
+      position: "relative", // For the dropdown menu
+    },
+    headerTitleContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: "15px", // Slightly more space between title and file name
     },
     headerTitle: {
-      fontSize: "20px",
+      fontSize: "22px",
       margin: 0,
       fontWeight: "bold",
       flex: 1, // Makes the title take up available space on the left
+      cursor: "default",
+    },
+    activeFileName: {
+      fontSize: "14px",
+      color: "#b3b3b3", // Lighter color for the active file name
+      fontStyle: "italic",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      maxWidth: "200px", // Limit the width of the file name container
+      cursor: "default",
     },
     controls: {
       display: "flex",
-      gap: "15px",
+      gap: "20px", // Add more space between controls
       alignItems: "center",
       justifyContent: "flex-end", // Aligns the buttons to the right
     },
@@ -46,6 +62,9 @@ const Header = ({
       fontSize: "14px",
       fontWeight: "bold",
       transition: "background-color 0.3s ease",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px", // Added space for icon and text
     },
     toggleButtonHover: {
       backgroundColor: "#005f99",
@@ -60,7 +79,7 @@ const Header = ({
       borderRadius: "4px",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
       zIndex: 1000,
-      width: "150px",
+      width: "160px",
       display: isExportMenuOpen ? "block" : "none",
     },
     dropdownItem: {
@@ -75,12 +94,16 @@ const Header = ({
       backgroundColor: "#333",
     },
     hamburgerButton: {
-      fontSize: "20px",
+      fontSize: "30px", // Larger size for better visibility
       backgroundColor: "transparent",
       color: "#fff",
       border: "none",
       cursor: "pointer",
       padding: "0",
+      transition: "transform 0.3s ease",
+    },
+    hamburgerButtonHover: {
+      transform: "scale(1.2)", // Add a scaling effect on hover
     },
   };
 
@@ -99,19 +122,26 @@ const Header = ({
 
   return (
     <header style={styles.header}>
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={styles.headerTitleContainer}>
         {/* Hamburger Menu Button */}
-        <button style={styles.hamburgerButton} onClick={toggleSidePanel}>
+        <button
+          style={{ ...styles.hamburgerButton, ...styles.hamburgerButtonHover }}
+          onClick={toggleSidePanel}
+          onMouseOver={(e) => (e.target.style.transform = "scale(1.2)")}
+          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
+        >
           ☰
         </button>
         {/* Markdown Editor Title */}
-        <h1 style={styles.headerTitle}> Markdown Editor 📄</h1>
+        <h1 style={styles.headerTitle}>
+          {`${activeFile} 📄`}
+        </h1>
       </div>
 
       <div style={styles.controls}>
         {/* Import Button */}
         <label htmlFor="file-input" style={styles.toggleButton}>
-          Import
+          <span>Import</span>
           <input
             id="file-input"
             type="file"

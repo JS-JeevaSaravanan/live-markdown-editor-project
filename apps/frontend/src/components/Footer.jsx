@@ -4,10 +4,10 @@ const Footer = () => {
       backgroundColor: "#1e1e1e", // Dark gray background
       color: "#f5f5f5", // Light text for contrast
       padding: "10px 20px",
-      textAlign: "center",
+      textAlign: "right",
       fontFamily: "Consolas, 'Courier New', monospace", // Coding-style font
       fontSize: "14px", // Subtle font size for footer
-      borderTop: "1px solid #333", // Top border for separation
+      borderTop: "1px solid #444", // Lighter and thinner border
       marginTop: "auto", // Ensures it stays at the bottom
     },
     link: {

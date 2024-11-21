@@ -72,6 +72,7 @@ const MainSection = ({ activeFile, content, saveFile, isSidePanelOpen }) => {
       backgroundColor: "#1e1e1e",
       color: "#dcdcdc",
       fontFamily: "Consolas, 'Courier New', monospace",
+      marginLeft: isSidePanelOpen ? "200px" : "0",
     },
     textarea: {
       width: isSidePanelOpen ? "50%" : "100%",
